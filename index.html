@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI & Implementasi di Industri Contact Center</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ==========================================================================
+           CSS VARIABLES & RESET
+           ========================================================================== */
+        :root {
+            --color-primary: #1E40AF;
+            --color-secondary: #4338CA;
+            --color-accent: #38BDF8;
+            --color-dark: #0F172A;
+            --color-darker: #0B1120;
+            --color-light: #F8FAFC;
+            --color-white: #FFFFFF;
+            --text-main: #334155;
+            --text-light: #94A3B8;
+            --font-family: 'Inter', sans-serif;
+            --transition-smooth: all 0.3s ease-in-out;
+            --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--color-light);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* ==========================================================================
+           TYPOGRAPHY & BUTTONS
+           ========================================================================== */
+        h1, h2, h3, h4 {
+            color: var(--color-dark);
+            line-height: 1.2;
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, var(--color-accent), #818CF8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.875rem 2rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            border: none;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--color-accent);
+            color: var(--color-darker);
+            box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn-primary:hover {
+            background-color: #7DD3FC;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-white);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1.5rem 0;
+            transition: var(--transition-smooth);
+        }
+
+        header.scrolled {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .nav-links a {
+            color: var(--color-white);
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--color-accent);
+        }
+
+        .mobile-toggle {
+            display: none;
+            color: var(--color-white);
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .mobile-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: var(--color-dark);
+            flex-direction: column;
+            padding: 1rem 0;
+            display: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu a {
+            padding: 1rem 2rem;
+            color: var(--color-white);
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            background-color: var(--color-dark);
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(30, 64, 175, 0.4) 0%, transparent 50%), 
+                radial-gradient(circle at 80% 80%, rgba(67, 56, 202, 0.4) 0%, transparent 50%);
+            display: flex;
+            align-items: center;
+            padding-top: 5rem;
+            overflow: hidden;
+        }
+
+        .hero-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .hero-content {
+            flex: 1;
+        }
+
+        .hero-content h1 {
+            color: var(--color-white);
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-content p {
+            color: var(--text-light);
+            font-size: 1.25rem;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .hero-visual {
+            flex: 1;
+            position: relative;
+        }
+
+        .dashboard-mockup {
+            background-color: var(--color-darker);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            aspect-ratio: 16/9;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dashboard-mockup img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7;
+        }
+
+        .floating-badge {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--color-white);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .badge-1 { top: 20px; left: -20px; }
+        .badge-2 { bottom: 20px; right: -20px; animation-delay: 2s; }
+
+        .badge-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .section {
+            padding: 6rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header .subtitle {
+            color: var(--color-primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            max-width: 700px;
+            margin: 0 auto;
+            color: var(--text-main);
+            font-size: 1.1rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background-color: var(--color-white);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-card);
+            transition: var(--transition-smooth);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            background-color: #EFF6FF;
+            color: var(--color-primary);
+            transition: var(--transition-smooth);
+        }
+
+        .feature-card:hover .feature-icon {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        .feature-list i {
+            color: #10B981;
+        }
+
+        /* ==========================================================================
+           MANFAAT & KONTAK SECTIONS
+           ========================================================================== */
+        .bg-gray {
+            background-color: #F1F5F9;
+        }
+
+        .benefits-container {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+        }
+
+        .benefits-image {
+            flex: 1;
+        }
+
+        .benefits-image img {
+            width: 100%;
+            border-radius: 1.5rem;
+            box-shadow: var(--shadow-card);
+        }
+
+        .benefits-content {
+            flex: 1;
+        }
+
+        .benefit-item {
+            display: flex;
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .benefit-number {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #DBEAFE;
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .benefit-text h4 {
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            background-color: var(--color-dark);
+            color: var(--color-white);
+            text-align: center;
+            position: relative;
+        }
+
+        .contact-section h2 {
+            color: var(--color-white);
+        }
+
+        .contact-section p {
+            color: var(--text-light);
+        }
+
+        .contact-form {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: var(--color-white);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            text-align: left;
+            color: var(--text-main);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+
+        .contact-form h3 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid #CBD5E1;
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .btn-submit {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        /* ==========================================================================
+           FOOTER & RESPONSIVE
+           ========================================================================== */
+        footer {
+            background-color: var(--color-darker);
+            color: var(--color-white);
+            padding: 4rem 0 2rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-brand p {
+            color: var(--text-light);
+            margin: 1rem 0;
+            max-width: 350px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+        }
+
+        .social-links a:hover {
+            background-color: var(--color-accent);
+            color: var(--color-darker);
+        }
+
+        .footer-links h4 {
+            color: var(--color-white);
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links ul li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links ul li a {
+            color: var(--text-light);
+            transition: color 0.2s;
+        }
+
+        .footer-links ul li a:hover {
+            color: var(--color-accent);
+        }
+
+        .footer-links i {
+            color: var(--color-accent);
+            width: 20px;
+        }
+
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Media Queries (Responsive Design) */
+        @media (max-width: 992px) {
+            .hero-content h1 { font-size: 2.75rem; }
+            .benefits-container { flex-direction: column; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links, .header-btn { display: none; }
+            .mobile-toggle { display: block; }
+            
+            .hero-container { flex-direction: column; text-align: center; padding-top: 2rem; }
+            .hero-content p { margin: 0 auto 2rem; }
+            .hero-actions { justify-content: center; flex-direction: column; }
+            
+            .floating-badge { display: none; } /* Hide complex graphics on mobile */
+            
+            .section-header h2 { font-size: 2rem; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .footer-bottom { flex-direction: column; text-align: center; gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="header">
+        <div class="container nav-container">
+            <div class="logo">
+                <i class="fa-solid fa-headset"></i> OmniAI
+            </div>
+            
+            <nav class="nav-links">
+                <a href="#beranda">Beranda</a>
+                <a href="#implementasi">Implementasi AI</a>
+                <a href="#manfaat">Manfaat</a>
+            </nav>
+            
+            <div class="header-btn">
+                <a href="#kontak" class="btn btn-primary">Hubungi Kami</a>
+            </div>
+
+            <!-- Hamburger Button for Mobile -->
+            <button class="mobile-toggle" id="mobileToggle">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="#beranda" class="mobile-link">Beranda</a>
+            <a href="#implementasi" class="mobile-link">Implementasi AI</a>
+            <a href="#manfaat" class="mobile-link">Manfaat</a>
+            <a href="#kontak" class="mobile-link" style="color: var(--color-accent);">Hubungi Kami</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section id="beranda" class="hero">
+            <div class="container hero-container">
+                <div class="hero-content">
+                    <h1>AI dan Implementasi AI di Industri <span class="text-gradient">Contact Center</span></h1>
+                    <p>Tingkatkan efisiensi operasional dan berikan pengalaman pelanggan (CX) yang luar biasa dengan solusi omnichannel cerdas berbasis Kecerdasan Buatan.</p>
+                    <div class="hero-actions">
+                        <a href="#implementasi" class="btn btn-primary">Pelajari Lebih Lanjut</a>
+                        <a href="#kontak" class="btn btn-outline">Jadwalkan Demo</a>
+                    </div>
+                </div>
+                
+                <div class="hero-visual">
+                    <div class="dashboard-mockup">
+                        <img src="https://placehold.co/800x450/0F172A/38BDF8?text=Dashboard+AI+Omnichannel" alt="Dashboard AI">
+                        
+                        <!-- Floating Elements -->
+                        <div class="floating-badge badge-1">
+                            <div class="badge-icon" style="background: rgba(16, 185, 129, 0.2); color: #10B981;">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.75rem; color: var(--text-light);">Resolusi Otomatis</div>
+                                <div style="font-weight: 700;">+85%</div>
+                            </div>
+                        </div>
+
+                        <div class="floating-badge badge-2">
+                            <div>
+                                <div style="font-size: 0.75rem; color: var(--text-light);">Sentimen Pelanggan</div>
+                                <div style="font-weight: 700; color: var(--color-accent);">Sangat Positif</div>
+                            </div>
+                            <div class="badge-icon" style="background: rgba(56, 189, 248, 0.2); color: var(--color-accent);">
+                                <i class="fa-solid fa-face-smile"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Implementasi Section -->
+        <section id="implementasi" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="subtitle">Penerapan Nyata</span>
+                    <h2>Bagaimana AI Mengubah Contact Center</h2>
+                    <p>Teknologi AI bukan lagi sekadar tren masa depan, melainkan solusi praktis saat ini yang mengatasi berbagai tantangan operasional layanan pelanggan.</p>
+                </div>
+
+                <div class="features-grid">
+                    <!-- Feature 1 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <h3>Chatbot & Virtual Assistant</h3>
+                        <p>AI berbasis pemrosesan bahasa alami (NLP) mampu memahami konteks, memberikan respon instan 24/7 untuk FAQ, dan mengarahkan isu kompleks ke agen manusia.</p>
+                        <ul class="feature-list">
+                            <li><i class="fa-solid fa-check-circle"></i> Mengurangi waktu tunggu antrean.</li>
+                            <li><i class="fa-solid fa-check-circle"></i> Menghemat biaya operasional 24/7.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="feature-card">
+                        <div class="feature-icon" style="color: var(--color-secondary); background: #E0E7FF;">
+                            <i class="fa-solid fa-chart-pie"></i>
+                        </div>
+                        <h3>Analisis Sentimen (Sentiment)</h3>
+                        <p>Sistem menganalisis nada suara atau teks pelanggan secara real-time untuk mendeteksi emosi seperti frustrasi, kepuasan, atau kebingungan selama interaksi.</p>
+                        <ul class="feature-list">
+                            <li><i class="fa-solid fa-check-circle"></i> Deteksi dini pelanggan yang marah.</li>
+                            <li><i class="fa-solid fa-check-circle"></i> Penyesuaian komunikasi agen secara instan.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="feature-card">
+                        <div class="feature-icon" style="color: #0284C7; background: #E0F2FE;">
+                            <i class="fa-solid fa-headset"></i>
+                        </div>
+                        <h3>Agent Assist & Rekomendasi</h3>
+                        <p>AI pasif "mendengarkan" percakapan dan proaktif menampilkan artikel *knowledge base* atau skrip solusi yang relevan di layar agen secara otomatis.</p>
+                        <ul class="feature-list">
+                            <li><i class="fa-solid fa-check-circle"></i> Meningkatkan First Contact Resolution.</li>
+                            <li><i class="fa-solid fa-check-circle"></i> Mempercepat *onboarding* agen baru.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Manfaat Section -->
+        <section id="manfaat" class="section bg-gray">
+            <div class="container benefits-container">
+                <div class="benefits-image">
+                    <img src="https://placehold.co/800x600/CBD5E1/475569?text=Tim+Layanan+Pelanggan" alt="Tim Layanan Pelanggan Modern">
+                </div>
+                
+                <div class="benefits-content">
+                    <h2 style="font-size: 2.25rem; margin-bottom: 1rem;">Kenapa Bisnis Anda Membutuhkan AI Contact Center?</h2>
+                    <p style="color: var(--text-main); margin-bottom: 2rem; font-size: 1.1rem;">
+                        Integrasi AI bukan untuk menggantikan peran manusia, melainkan untuk memberdayakan agen Anda agar fokus pada empati dan pemecahan masalah yang kompleks.
+                    </p>
+
+                    <div class="benefit-item">
+                        <div class="benefit-number">1</div>
+                        <div class="benefit-text">
+                            <h4>Efisiensi Operasional Skala Besar</h4>
+                            <p>Tangani lonjakan tiket (*spike*) tanpa harus menambah jumlah agen secara signifikan setiap bulannya.</p>
+                        </div>
+                    </div>
+
+                    <div class="benefit-item">
+                        <div class="benefit-number" style="background: #E0E7FF; color: var(--color-secondary);">2</div>
+                        <div class="benefit-text">
+                            <h4>Pengalaman Omnichannel Mulus</h4>
+                            <p>Data pelanggan tersinkronisasi di berbagai saluran (WA, Email, Sosmed) memberikan konteks utuh.</p>
+                        </div>
+                    </div>
+
+                    <div class="benefit-item">
+                        <div class="benefit-number" style="background: #D1FAE5; color: #059669;">3</div>
+                        <div class="benefit-text">
+                            <h4>Wawasan Berbasis Data</h4>
+                            <p>Ekstrak pola dan keluhan dari ribuan interaksi harian untuk perbaikan produk dan layanan.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Kontak Section -->
+        <section id="kontak" class="section contact-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Siap Mengoptimalkan Layanan Anda?</h2>
+                    <p>Diskusikan kebutuhan spesifik bisnis Anda dengan tim ahli kami hari ini.</p>
+                </div>
+
+                <div class="contact-form" id="formContainer">
+                    <h3>Hubungi Kami</h3>
+                    <form id="demoForm">
+                        <div class="form-group">
+                            <label for="name">Nama Lengkap</label>
+                            <input type="text" id="name" class="form-control" placeholder="Masukkan nama Anda" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Perusahaan</label>
+                            <input type="email" id="email" class="form-control" placeholder="nama@perusahaan.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Pesan (Opsional)</label>
+                            <textarea id="message" class="form-control" rows="4" placeholder="Kebutuhan bisnis Anda..."></textarea>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-submit" onclick="submitForm()">Jadwalkan Konsultasi Gratis</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <i class="fa-solid fa-headset"></i> OmniAI
+                    </div>
+                    <p>Penyedia solusi omnichannel dan AI contact center terkemuka untuk bisnis modern yang memprioritaskan pengalaman pelanggan unggul.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <h4>Produk Utama</h4>
+                    <ul>
+                        <li><a href="#">Omnichannel Inbox</a></li>
+                        <li><a href="#">AI Chatbot Engine</a></li>
+                        <li><a href="#">Sentiment Analytics</a></li>
+                        <li><a href="#">Agent Assist</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-links">
+                    <h4>Kontak Kami</h4>
+                    <ul>
+                        <li><i class="fa-solid fa-location-dot"></i> Gedung Inovasi Lt. 8, Jl. Sudirman 123, Jakarta 12190</li>
+                        <li><i class="fa-solid fa-phone"></i> +62 21 5555 8888</li>
+                        <li><i class="fa-solid fa-envelope"></i> halo@omniai-fiktif.co.id</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 OmniAI Solutions. Hak Cipta Dilindungi.</p>
+                <div>
+                    <a href="#" style="margin-right: 1rem;">Kebijakan Privasi</a>
+                    <a href="#">Syarat & Ketentuan</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script Interaktivitas -->
+    <script>
+        // 1. Efek Scroll pada Header
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // 2. Toggle Menu Mobile
+        const mobileToggle = document.getElementById('mobileToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const icon = mobileToggle.querySelector('i');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        function toggleMenu() {
+            mobileMenu.classList.toggle('active');
+            if (mobileMenu.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-xmark');
+            } else {
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            }
+        }
+
+        mobileToggle.addEventListener('click', toggleMenu);
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if(mobileMenu.classList.contains('active')) {
+                    toggleMenu();
+                }
+            });
+        });
+
+        // 3. Simulasi Pengiriman Form (Mencegah reload & menampilkan pesan sukses)
+        function submitForm() {
+            const btn = document.querySelector('.btn-submit');
+            const form = document.getElementById('demoForm');
+            const nameInput = document.getElementById('name').value;
+            const emailInput = document.getElementById('email').value;
+
+            // Validasi sederhana
+            if(!nameInput || !emailInput) {
+                // Daripada menggunakan alert(), kita ubah teks tombol sejenak
+                const originalText = btn.innerHTML;
+                btn.innerHTML = 'Mohon isi Nama & Email';
+                btn.style.backgroundColor = '#EF4444'; // Merah error
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.backgroundColor = '';
+                }, 2000);
+                return;
+            }
+
+            // Status Loading
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
+            btn.style.opacity = '0.8';
+            btn.style.pointerEvents = 'none';
+
+            // Simulasi proses API (1.5 detik)
+            setTimeout(() => {
+                const container = document.getElementById('formContainer');
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem 0;">
+                        <div style="width: 80px; height: 80px; background: #D1FAE5; color: #10B981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 1.5rem;">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--color-dark);">Terima Kasih, ${nameInput.split(' ')[0]}!</h3>
+                        <p style="color: var(--text-light); margin-bottom: 1.5rem;">Pesan Anda telah kami terima. Tim ahli kami akan segera menghubungi Anda melalui email.</p>
+                        <button onclick="location.reload()" class="btn btn-outline" style="color: var(--color-primary); border-color: var(--color-primary);">Kembali ke Beranda</button>
+                    </div>
+                `;
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
